@@ -21,4 +21,17 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>  
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="MySql.Data" Version="8.0.31" />
+    <PackageReference Include="Dapper" Version="2.0.123" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BlUoW\BlUoW.csproj" />
+  </ItemGroup>
+
 </Project>
