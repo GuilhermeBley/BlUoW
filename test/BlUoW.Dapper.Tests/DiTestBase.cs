@@ -34,7 +34,9 @@ public class DiTestBase
     private IConfiguration BuildConfiguration()
     {
         IConfigurationBuilder configurationBuilder =
-            new ConfigurationBuilder().AddJsonFile("appsettings.Development.json");
+            new ConfigurationBuilder()
+            .AddJsonFile("appsettings.Development.json", true)
+            .AddJsonFile("appsettings.json", true);
 
         return configurationBuilder.Build();
     }

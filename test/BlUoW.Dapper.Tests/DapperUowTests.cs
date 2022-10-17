@@ -13,11 +13,16 @@ namespace BlUoW.Dapper.Tests;
 
 public class DapperUowTests : DiTestBase
 {
-    private readonly SessionTestRepository _testRepository;
+    private readonly TestRepository _testRepository;
     public DapperUowTests() : base(AddServices)
     {
         _testRepository 
-            = ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<SessionTestRepository>();
+            = ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<TestRepository>();
+    }
+
+    private SessionTestRepository GetSessionestRepository()
+    {
+        return ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<SessionTestRepository>();
     }
 
     private static void AddServices(IServiceCollection services)
