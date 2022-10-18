@@ -1,5 +1,7 @@
 using BlUoW.Dapper.Tests.Factories;
+using BlUoW.Dapper.Tests.Model;
 using BlUoW.Dapper.Tests.Repositories;
+using BlUoW.Dapper.Tests.Services;
 using BlUoW.Factories;
 using BlUoW.Session;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,9 +22,31 @@ public class DapperUowTests : DiTestBase
             = ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<TestRepository>();
     }
 
-    private SessionTestRepository GetSessionestRepository()
+    [Fact]
+    public async Task AddAndRemove_WithOpenConnection_SuccessAddAndRemove()
     {
-        return ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<SessionTestRepository>();
+        var service = GetSessionestRepository();
+        var repository = service.SessionTestRepository;
+        var uoW = service.UoW;
+
+        using (uoW.OpenConnectionAsync())
+        {
+            Assert.Equal(1, await repository.InsertTable1(
+                new Table1
+                {
+                    Execution = uoW.IdUoW
+                }
+            ));
+        }
+    }
+
+    /// <summary>
+    /// Gets a scope service
+    /// </summary>
+    /// <returns>new <see cref="ServiceTest"/></returns>
+    private ServiceTest GetSessionestRepository()
+    {
+        return ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<ServiceTest>();
     }
 
     private static void AddServices(IServiceCollection services)
@@ -31,7 +55,12 @@ public class DapperUowTests : DiTestBase
             .AddSingleton<IConnectionFactory, ConnectionFactory>()
             .AddScoped<DbSession>()
             .AddScoped<IDbSession>(x => x.GetRequiredService<DbSession>())
-            .AddScoped<IUnitOfWork>(x => x.GetRequiredService<DbSession>());
+            .AddScoped<IUnitOfWork>(x => x.GetRequiredService<DbSession>())
+            
+            .AddScoped(typeof(Table2Repository))
+            .AddScoped(typeof(TestRepository))
+            
+            .AddScoped(typeof(ServiceTest));
     }
 
 }
