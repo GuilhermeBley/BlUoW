@@ -9,14 +9,17 @@ namespace BlUoW.Dapper.Tests.Services;
 internal class ServiceTest
 {
     private readonly IUnitOfWork _uoW;
-    private readonly Table2Repository _sessionTestRepository;
+    private readonly Table1Repository _table1Repository;
+    private readonly Table2Repository _table2Repository;
 
     public IUnitOfWork UoW => _uoW;
-    public Table2Repository SessionTestRepository => _sessionTestRepository;
+    public Table1Repository Table1Repository => _table1Repository;
+    public Table2Repository Table2Repository => _table2Repository;
 
-    public ServiceTest(IUnitOfWork uoW, Table2Repository sessionTestRepository)
+    public ServiceTest(IUnitOfWork uoW, Table1Repository table1Repository, Table2Repository table2Repository)
     {
         _uoW = uoW;
-        _sessionTestRepository = sessionTestRepository;
+        _table1Repository = table1Repository;
+        _table2Repository = table2Repository;
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace BlUoW.Dapper.Tests;
 
@@ -18,26 +19,28 @@ public class DiTestBase
 
     public DiTestBase(Action<IServiceCollection>? actionServices = null)
     {
-        var configuration = BuildConfiguration();
-        var serviceProvider = BuildServiceProvider(configuration, actionServices);
-        _serviceProvider = serviceProvider;
+        IHost host = CreateHost(actionServices);
+        _serviceProvider = host.Services;
     }
 
-    private IServiceProvider BuildServiceProvider(IConfiguration configuration, Action<IServiceCollection>? actionServices = null)
+    private static IHost CreateHost(Action<IServiceCollection>? actionServices = null)
     {
-        IServiceCollection services = new ServiceCollection();
-        services.AddSingleton(configuration);
-        actionServices?.Invoke(services);
-        return services.BuildServiceProvider();
-    }
-
-    private IConfiguration BuildConfiguration()
-    {
-        IConfigurationBuilder configurationBuilder =
-            new ConfigurationBuilder()
-            .AddJsonFile("appsettings.Development.json", true)
-            .AddJsonFile("appsettings.json", true);
-
-        return configurationBuilder.Build();
-    }
+        return
+            Host.CreateDefaultBuilder()
+                .ConfigureAppConfiguration((context, builder) =>
+                {
+                    // Add other configuration files...
+                    builder.AddJsonFile("appsettings.Development.json", optional: true);
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddSingleton(context.Configuration);
+                    actionServices?.Invoke(services);
+                })
+                .ConfigureLogging(logging =>
+                {
+                    // Add other loggers...
+                })
+                .Build() ?? throw new ArgumentNullException();
+    } 
 }

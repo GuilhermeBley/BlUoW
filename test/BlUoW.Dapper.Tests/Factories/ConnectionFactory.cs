@@ -14,6 +14,7 @@ public class ConnectionFactory : IConnectionFactory
     }
     public DbConnection GetNewConnection()
     {
+        var s = _configuration.GetConnectionString(ConnectionStringName);
         return 
             new MySql.Data.MySqlClient.MySqlConnection(
                 _configuration.GetConnectionString(ConnectionStringName));

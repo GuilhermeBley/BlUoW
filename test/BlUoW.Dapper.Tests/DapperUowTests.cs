@@ -26,17 +26,38 @@ public class DapperUowTests : DiTestBase
     public async Task AddAndRemove_WithOpenConnection_SuccessAddAndRemove()
     {
         var service = GetSessionestRepository();
-        var repository = service.SessionTestRepository;
+        var table1Repository = service.Table1Repository;
         var uoW = service.UoW;
 
         using (uoW.OpenConnectionAsync())
         {
-            Assert.Equal(1, await repository.InsertTable1(
+            var insert = await table1Repository.AddAsync(
                 new Table1
                 {
-                    Execution = uoW.IdUoW
-                }
-            ));
+                    Execution = uoW.IdUoW,
+                    InsertAt = DateTime.Now,
+                    Message = "inserted"
+                });
+
+            Assert.NotNull(insert);
+
+            if (insert is null) return;
+
+            var get = await table1Repository.GetByIdOrEmptyAsync(insert.Id);
+
+            Assert.NotNull(get);
+
+            if (get is null) return;
+
+            var delete = await table1Repository.DeleteAsync(get.Id);
+
+            Assert.NotNull(delete);
+
+            if (delete is null) return;
+
+            var getNull = await table1Repository.GetByIdOrEmptyAsync(delete.Id);
+
+            Assert.Null(get);
         }
     }
 
@@ -58,6 +79,7 @@ public class DapperUowTests : DiTestBase
             .AddScoped<IUnitOfWork>(x => x.GetRequiredService<DbSession>())
             
             .AddScoped(typeof(Table2Repository))
+            .AddScoped(typeof(Table1Repository))
             .AddScoped(typeof(TestRepository))
             
             .AddScoped(typeof(ServiceTest));
