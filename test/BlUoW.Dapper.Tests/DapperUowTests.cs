@@ -57,7 +57,7 @@ public class DapperUowTests : DiTestBase
 
             var getNull = await table1Repository.GetByIdOrEmptyAsync(delete.Id);
 
-            Assert.Null(get);
+            Assert.Null(getNull);
         }
     }
 

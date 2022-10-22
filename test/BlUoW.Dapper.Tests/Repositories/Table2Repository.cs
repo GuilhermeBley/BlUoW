@@ -4,7 +4,7 @@ using Dapper;
 
 namespace BlUoW.Dapper.Tests.Repositories;
 
-internal class Table2Repository : IRepository<Table2, Table2, string>
+internal class Table2Repository : IRepository<Table2, Table2, Guid>
 {
     private readonly IDbSession _dbSession;
 
@@ -32,21 +32,22 @@ internal class Table2Repository : IRepository<Table2, Table2, string>
         return model;
     }
 
-    public Task<Table2> UpdateAsync(string id, Table2 model)
+    public Task<Table2> UpdateAsync(Guid id, Table2 model)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Table2?> DeleteAsync(string id)
+    public async Task<Table2?> DeleteAsync(Guid id)
     {
         return await _dbSession.Connection.QueryFirstOrDefaultAsync<Table2>(
-            "DELETE FROM test.table2 WHERE Id=@id;" +
-            "SELECT Id, Execution, Message, InsertAt FROM test.table2 WHERE Id=@id;", new { Id = id },
+            "SELECT Id, Execution, Message, InsertAt FROM test.table2 WHERE Id=@id;" +
+            "DELETE FROM test.table2 WHERE Id=@id;"
+            , new { Id = id },
             _dbSession.Transaction
         );
     }
 
-    public async Task<Table2?> GetByIdOrEmptyAsync(string id)
+    public async Task<Table2?> GetByIdOrEmptyAsync(Guid id)
     {
         return await _dbSession.Connection.QueryFirstOrDefaultAsync<Table2>(
             "SELECT Id, Execution, Message, InsertAt FROM test.table2 WHERE Id=@id;", new { Id = id },
