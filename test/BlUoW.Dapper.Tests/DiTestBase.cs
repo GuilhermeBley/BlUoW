@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -19,8 +20,31 @@ public class DiTestBase
 
     public DiTestBase(Action<IServiceCollection>? actionServices = null)
     {
+        //var configuration = BuildConfiguration();
+        //var serviceProvider = BuildServiceProvider(configuration, actionServices);
+        //_serviceProvider = serviceProvider;
         IHost host = CreateHost(actionServices);
         _serviceProvider = host.Services;
+    }
+
+    private IServiceProvider BuildServiceProvider(IConfiguration configuration, Action<IServiceCollection>? actionServices = null)
+    {
+        IServiceCollection services = new ServiceCollection();
+        services.AddSingleton(configuration);
+        actionServices?.Invoke(services);
+        return services.BuildServiceProvider();
+    }
+
+    private IConfiguration BuildConfiguration()
+    {
+        IConfigurationBuilder configurationBuilder =
+            new ConfigurationBuilder()
+            .AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly(), optional: false)
+            .AddJsonFile("appsettings.json", true)
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddEnvironmentVariables();
+
+        return configurationBuilder.Build();
     }
 
     private static IHost CreateHost(Action<IServiceCollection>? actionServices = null)
@@ -30,11 +54,12 @@ public class DiTestBase
                 .ConfigureAppConfiguration((context, builder) =>
                 {
                     // Add other configuration files...
-                    builder.AddJsonFile("appsettings.Development.json", optional: true);
+                    builder
+                        .AddUserSecrets(System.Reflection.Assembly.GetExecutingAssembly(), optional: false)
+                        .AddEnvironmentVariables();
                 })
                 .ConfigureServices((context, services) =>
                 {
-                    services.AddSingleton(context.Configuration);
                     actionServices?.Invoke(services);
                 })
                 .ConfigureLogging(logging =>
