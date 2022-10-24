@@ -25,7 +25,7 @@ public class DapperUowTests : DiTestBase
     [Fact]
     public async Task AddAndRemove_WithOpenConnection_SuccessAddAndRemove()
     {
-        var service = GetSessionestRepository();
+        var service = GetSessionRepository();
         var table1Repository = service.Table1Repository;
         var uoW = service.UoW;
 
@@ -64,7 +64,7 @@ public class DapperUowTests : DiTestBase
     [Fact]
     public async Task Add_WithOutOpenConnection_FailedConnection()
     {
-        var service = GetSessionestRepository();
+        var service = GetSessionRepository();
         var table1Repository = service.Table1Repository;
         var uoW = service.UoW;
 
@@ -80,11 +80,11 @@ public class DapperUowTests : DiTestBase
     [Fact]
     public async Task AddWithTransaction_WithBeginTransaction_SuccessAddAndRemove()
     {
-        var service = GetSessionestRepository();
+        var service = GetSessionRepository();
         var table1Repository = service.Table1Repository;
         var uoW = service.UoW;
 
-        using (uoW.BeginTransactionAsync())
+        using (await uoW.BeginTransactionAsync())
         {
             var insert = await table1Repository.AddAsync(
                 new Table1
@@ -116,20 +116,141 @@ public class DapperUowTests : DiTestBase
         }
     }
 
+    [Fact]
+    public async Task AddWithTransaction_CheckBeginTransactionWithoutSave_FailedCheck()
+    {
+        var service = GetSessionRepository();
+        var connectionRepository = GetConnectionRepository();
+        var table1Repository = service.Table1Repository;
+        var uoW = service.UoW;
+
+        Table1 tableInserted;
+        using (await uoW.BeginTransactionAsync())
+        {
+            tableInserted = await table1Repository.AddAsync(
+                new Table1
+                {
+                    Execution = uoW.IdUoW,
+                    InsertAt = DateTime.Now,
+                    Message = "inserted"
+                });
+
+            Assert.NotNull(tableInserted);
+
+            if (tableInserted is null) return;
+        }
+
+        Assert.Null(await connectionRepository.GetByIdOrEmptyAsync(tableInserted.Id));
+    }
+    
+    [Fact]
+    public async Task AddWithTransaction_CheckBeginTransactionWithSave_SuccessCheck()
+    {
+        var service = GetSessionRepository();
+        var connectionRepository = GetConnectionRepository();
+        var table1Repository = service.Table1Repository;
+        var uoW = service.UoW;
+
+        Table1 tableInserted;
+        using (await uoW.BeginTransactionAsync())
+        {
+            tableInserted = await table1Repository.AddAsync(
+                new Table1
+                {
+                    Execution = uoW.IdUoW,
+                    InsertAt = DateTime.Now,
+                    Message = "inserted"
+                });
+
+            Assert.NotNull(tableInserted);
+
+            if (tableInserted is null) return;
+
+            await uoW.SaveChangesAsync();
+        }
+
+        Assert.NotNull(await connectionRepository.GetByIdOrEmptyAsync(tableInserted.Id));
+    }
+
+    [Fact]
+    public async Task AddWithConnection_CheckBeginTransactionWithoutSave_SuccessCheck()
+    {
+        var service = GetSessionRepository();
+        var connectionRepository = GetConnectionRepository();
+        var table1Repository = service.Table1Repository;
+        var uoW = service.UoW;
+
+        Table1 tableInserted;
+        using (await uoW.OpenConnectionAsync())
+        {
+            tableInserted = await table1Repository.AddAsync(
+                new Table1
+                {
+                    Execution = uoW.IdUoW,
+                    InsertAt = DateTime.Now,
+                    Message = "inserted"
+                });
+
+            Assert.NotNull(tableInserted);
+
+            if (tableInserted is null) return;
+        }
+
+        Assert.NotNull(await connectionRepository.GetByIdOrEmptyAsync(tableInserted.Id));
+    }
+    
+    [Fact]
+    public async Task AddWithConnection_CheckBeginTransactionWithSave_SuccessCheck()
+    {
+        var service = GetSessionRepository();
+        var connectionRepository = GetConnectionRepository();
+        var table1Repository = service.Table1Repository;
+        var uoW = service.UoW;
+
+        Table1 tableInserted;
+        using (await uoW.BeginTransactionAsync())
+        {
+            tableInserted = await table1Repository.AddAsync(
+                new Table1
+                {
+                    Execution = uoW.IdUoW,
+                    InsertAt = DateTime.Now,
+                    Message = "inserted"
+                });
+
+            Assert.NotNull(tableInserted);
+
+            if (tableInserted is null) return;
+
+            await uoW.SaveChangesAsync();
+        }
+
+        Assert.NotNull(await connectionRepository.GetByIdOrEmptyAsync(tableInserted.Id));
+    }
+
 
     /// <summary>
     /// Gets a scope service
     /// </summary>
     /// <returns>new <see cref="ServiceTest"/></returns>
-    private ServiceTest GetSessionestRepository()
+    private ServiceTest GetSessionRepository()
     {
         return ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<ServiceTest>();
+    }
+
+    /// <summary>
+    /// Gets a scope service
+    /// </summary>
+    /// <returns>new <see cref="Table1ConnectionRepository"/></returns>
+    private Table1ConnectionRepository GetConnectionRepository()
+    {
+        return ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<Table1ConnectionRepository>();
     }
 
     private static void AddServices(IServiceCollection services)
     {
         services
-            .AddSingleton<IConnectionFactory, ConnectionFactory>()
+            .AddScoped<IConnectionFactory, ConnectionFactory>()
             .AddScoped<DbSession>()
             .AddScoped<IDbSession>(x => x.GetRequiredService<DbSession>())
             .AddScoped<IUnitOfWork>(x => x.GetRequiredService<DbSession>())
