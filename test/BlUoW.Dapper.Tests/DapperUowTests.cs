@@ -228,6 +228,34 @@ public class DapperUowTests : DiTestBase
         Assert.NotNull(await connectionRepository.GetByIdOrEmptyAsync(tableInserted.Id));
     }
 
+    [Fact]
+    public async Task Add_WithConnectionAndTransaction_SuccessConnection()
+    {
+        var service = GetSessionRepository();
+        var connectionRepository = GetConnectionRepository();
+        var table1Repository = service.Table1Repository;
+        var uoW = service.UoW;
+
+        Table1 tableInserted;
+        using (await uoW.OpenConnectionAsync())
+        {
+            await uoW.BeginTransactionAsync();
+            tableInserted = await table1Repository.AddAsync(
+                new Table1
+                {
+                    Execution = uoW.IdUoW,
+                    InsertAt = DateTime.Now,
+                    Message = "inserted"
+                });
+
+            Assert.Null(await connectionRepository.GetByIdOrEmptyAsync(tableInserted.Id));
+
+            await uoW.SaveChangesAsync();
+        }
+
+        Assert.NotNull(await connectionRepository.GetByIdOrEmptyAsync(tableInserted.Id));
+    }
+
 
     /// <summary>
     /// Gets a scope service

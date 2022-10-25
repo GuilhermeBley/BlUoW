@@ -75,7 +75,7 @@ public class DbSession : IUnitOfWork, IDbSession
     }
 
     /// <summary>
-    /// Releases connection and transaction
+    /// Try releases connection and transaction
     /// </summary>
     public void Dispose()
     {
@@ -105,6 +105,9 @@ public class DbSession : IUnitOfWork, IDbSession
     /// <summary>
     /// Commit async transaction and releases it
     /// </summary>
+    /// <remarks>
+    ///     <para>If occurs exception, will be do a Rollback and throw the exception</para>
+    /// </remarks>
     public async Task SaveChangesAsync()
     {
         if (_transaction is null)

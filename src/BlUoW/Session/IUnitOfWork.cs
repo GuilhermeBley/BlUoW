@@ -29,12 +29,18 @@ public interface IUnitOfWork : IDisposable
     /// <summary>
     /// Commits a transaction if is ok or roll back if throw a exception
     /// </summary>
+    /// <remarks>
+    ///     <para>Finishs transaction</para>
+    /// </remarks>
     /// <returns><see cref="Task"/></returns>
     Task SaveChangesAsync();
 
     /// <summary>
     /// Roll back transaction
     /// </summary>
+    /// <remarks>
+    ///     <para>Finishs transaction</para>
+    /// </remarks>
     /// <returns><see cref="Task"/></returns>
     Task RollBackAsync();
 }
