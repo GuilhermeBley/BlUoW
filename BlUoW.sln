@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlUoW.Dapper.Tests", "test\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlUoW.Microsoft.Extensions.DependencyInjection", "src\BlUoW.Microsoft.Extensions.DependencyInjection\BlUoW.Microsoft.Extensions.DependencyInjection.csproj", "{769539AF-83EB-46FF-8C56-30F152B875E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlUoW.Microsoft.Extensions.DependencyInjection.Tests", "test\BlUoW.Microsoft.Extensions.DependencyInjection.Tests\BlUoW.Microsoft.Extensions.DependencyInjection.Tests.csproj", "{CF7F24D2-8E26-4F27-A49F-E1E2ECD2C65E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +36,15 @@ Global
 		{769539AF-83EB-46FF-8C56-30F152B875E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{769539AF-83EB-46FF-8C56-30F152B875E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{769539AF-83EB-46FF-8C56-30F152B875E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF7F24D2-8E26-4F27-A49F-E1E2ECD2C65E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF7F24D2-8E26-4F27-A49F-E1E2ECD2C65E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF7F24D2-8E26-4F27-A49F-E1E2ECD2C65E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF7F24D2-8E26-4F27-A49F-E1E2ECD2C65E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{23800C85-6569-4AFE-8B98-D26EF06E4340} = {C3DED4FD-5A72-4328-98BE-2470D0D8D6AB}
 		{D69EE342-6D37-49A8-919F-925A9CA98998} = {1CD9597C-D713-47FF-8F8D-2BC4453A7032}
 		{769539AF-83EB-46FF-8C56-30F152B875E4} = {C3DED4FD-5A72-4328-98BE-2470D0D8D6AB}
+		{CF7F24D2-8E26-4F27-A49F-E1E2ECD2C65E} = {1CD9597C-D713-47FF-8F8D-2BC4453A7032}
 	EndGlobalSection
 EndGlobal

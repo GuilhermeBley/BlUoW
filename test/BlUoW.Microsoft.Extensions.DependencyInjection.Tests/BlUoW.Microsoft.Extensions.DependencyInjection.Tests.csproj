@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\BlUoW\BlUoW.csproj" />
+    <ProjectReference Include="..\..\src\BlUoW.Microsoft.Extensions.DependencyInjection\BlUoW.Microsoft.Extensions.DependencyInjection.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace BlUoW.Dapper.Tests;
+namespace BlUoW.Microsoft.Extensions.DependencyInjection.Tests;
 
 /// <summary>
 /// Test base with service providier
