@@ -13,7 +13,7 @@ public static class ExtensionDi
     /// <param name="services">extension of services</param>
     /// <param name="connectionFactoryType">type of factory</param>
     /// <returns>same <paramref name="services"/></returns>
-    public static ServiceCollection AddUnitOfWork(this ServiceCollection services, Type connectionFactoryType)
+    public static IServiceCollection AddUnitOfWork(this IServiceCollection services, Type connectionFactoryType)
     {
         if (!connectionFactoryType.IsClass)
             throw new ArgumentException($"{nameof(connectionFactoryType)} is not a class.");
@@ -37,7 +37,7 @@ public static class ExtensionDi
     /// <param name="services">extension of services</param>
     /// <typeparam name="T">type of factory</typeparam>
     /// <returns>same <paramref name="services"/></returns>
-    public static ServiceCollection AddUnitOfWork<T>(this ServiceCollection services)
+    public static IServiceCollection AddUnitOfWork<T>(this IServiceCollection services)
         where T : class, IConnectionFactory
     {
         return AddUnitOfWork(services, typeof(T));
