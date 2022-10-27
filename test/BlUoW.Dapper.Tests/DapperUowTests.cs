@@ -120,7 +120,7 @@ public class DapperUowTests : DiTestBase
     public async Task AddWithTransaction_CheckBeginTransactionWithoutSave_FailedCheck()
     {
         var service = GetSessionRepository();
-        var connectionRepository = GetConnectionRepository();
+        var connectionRepository = GetConnectionTable1Repository();
         var table1Repository = service.Table1Repository;
         var uoW = service.UoW;
 
@@ -147,7 +147,7 @@ public class DapperUowTests : DiTestBase
     public async Task AddWithTransaction_CheckBeginTransactionWithSave_SuccessCheck()
     {
         var service = GetSessionRepository();
-        var connectionRepository = GetConnectionRepository();
+        var connectionRepository = GetConnectionTable1Repository();
         var table1Repository = service.Table1Repository;
         var uoW = service.UoW;
 
@@ -176,7 +176,7 @@ public class DapperUowTests : DiTestBase
     public async Task AddWithConnection_CheckBeginTransactionWithoutSave_SuccessCheck()
     {
         var service = GetSessionRepository();
-        var connectionRepository = GetConnectionRepository();
+        var connectionRepository = GetConnectionTable1Repository();
         var table1Repository = service.Table1Repository;
         var uoW = service.UoW;
 
@@ -203,7 +203,7 @@ public class DapperUowTests : DiTestBase
     public async Task AddWithConnection_CheckBeginTransactionWithSave_SuccessCheck()
     {
         var service = GetSessionRepository();
-        var connectionRepository = GetConnectionRepository();
+        var connectionRepository = GetConnectionTable1Repository();
         var table1Repository = service.Table1Repository;
         var uoW = service.UoW;
 
@@ -232,7 +232,7 @@ public class DapperUowTests : DiTestBase
     public async Task Add_WithConnectionAndTransaction_SuccessConnection()
     {
         var service = GetSessionRepository();
-        var connectionRepository = GetConnectionRepository();
+        var connectionRepository = GetConnectionTable1Repository();
         var table1Repository = service.Table1Repository;
         var uoW = service.UoW;
 
@@ -256,6 +256,48 @@ public class DapperUowTests : DiTestBase
         Assert.NotNull(await connectionRepository.GetByIdOrEmptyAsync(tableInserted.Id));
     }
 
+    [Fact]
+    public async Task AddWithTwoRepositories_WithTransaction_SuccessAddedInRepositories()
+    {
+        var service = GetSessionRepository();
+        var table1ConnectionRepository = GetConnectionTable1Repository();
+        var table2ConnectionRepository = GetConnectionTable2Repository();
+        var table1Repository = service.Table1Repository;
+        var table2Repository = service.Table2Repository;
+        var uoW = service.UoW;
+
+        Table1 table1Inserted;
+        Table2 table2Inserted;
+        using (await uoW.BeginTransactionAsync())
+        {
+            table1Inserted = await table1Repository.AddAsync(
+                new Table1
+                {
+                    Execution = uoW.IdUoW,
+                    InsertAt = DateTime.Now,
+                    Message = "inserted"
+                });
+
+                
+            table2Inserted = await table2Repository.AddAsync(
+                new Table2
+                {
+                    Execution = uoW.IdUoW,
+                    InsertAt = DateTime.Now,
+                    Message = "inserted"
+                });
+
+            Assert.Null(await table1ConnectionRepository.GetByIdOrEmptyAsync(table1Inserted.Id));
+            Assert.Null(await table2ConnectionRepository.GetByIdOrEmptyAsync(table2Inserted.Id));
+
+            await uoW.SaveChangesAsync();
+        }
+
+        Assert.NotNull(await table1ConnectionRepository.GetByIdOrEmptyAsync(table1Inserted.Id));
+        Assert.NotNull(await table2ConnectionRepository.GetByIdOrEmptyAsync(table2Inserted.Id));
+    }
+
+
 
     /// <summary>
     /// Gets a scope service
@@ -270,9 +312,18 @@ public class DapperUowTests : DiTestBase
     /// Gets a scope service
     /// </summary>
     /// <returns>new <see cref="Table1ConnectionRepository"/></returns>
-    private Table1ConnectionRepository GetConnectionRepository()
+    private Table1ConnectionRepository GetConnectionTable1Repository()
     {
         return ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<Table1ConnectionRepository>();
+    }
+
+    /// <summary>
+    /// Gets a scope service
+    /// </summary>
+    /// <returns>new <see cref="Table2ConnectionRepository"/></returns>
+    private Table2ConnectionRepository GetConnectionTable2Repository()
+    {
+        return ServiceProvider.CreateScope().ServiceProvider.GetRequiredService<Table2ConnectionRepository>();
     }
 
     private static void AddServices(IServiceCollection services)
@@ -286,6 +337,7 @@ public class DapperUowTests : DiTestBase
             .AddScoped(typeof(Table2Repository))
             .AddScoped(typeof(Table1Repository))
             .AddScoped(typeof(Table1ConnectionRepository))
+            .AddScoped(typeof(Table2ConnectionRepository))
             
             .AddScoped(typeof(ServiceTest));
     }
