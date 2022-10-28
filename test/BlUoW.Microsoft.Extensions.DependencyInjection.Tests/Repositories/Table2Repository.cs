@@ -8,6 +8,8 @@ internal class Table2Repository : IRepository<Table2, Table2, Guid>
 {
     private readonly IDbSession _dbSession;
 
+    public Guid idSession => _dbSession.IdSession;
+
     public Table2Repository(IDbSession dbSession)
     {
         _dbSession = dbSession;

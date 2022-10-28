@@ -18,7 +18,7 @@ public static class ExtensionDi
         if (!connectionFactoryType.IsClass)
             throw new ArgumentException($"{nameof(connectionFactoryType)} is not a class.");
 
-        if (!connectionFactoryType.IsInstanceOfType(typeof(IConnectionFactory)))
+        if (!typeof(IConnectionFactory).IsAssignableFrom(connectionFactoryType))
             throw new ArgumentException($"{nameof(connectionFactoryType)} is not a instance of type {nameof(IConnectionFactory)}.");
 
         services

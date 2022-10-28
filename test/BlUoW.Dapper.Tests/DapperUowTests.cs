@@ -297,8 +297,6 @@ public class DapperUowTests : DiTestBase
         Assert.NotNull(await table2ConnectionRepository.GetByIdOrEmptyAsync(table2Inserted.Id));
     }
 
-
-
     /// <summary>
     /// Gets a scope service
     /// </summary>
